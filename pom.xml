@@ -53,32 +53,6 @@
         </repository>
     </distributionManagement>
 
-    <repositories>
-        <repository>
-            <id>vaadin-prereleases</id>
-            <url>https://maven.vaadin.com/vaadin-prereleases/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>apache snapshots</id>
-            <url>https://repository.apache.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>vaadin-prereleases</id>
-            <url>
-                https://maven.vaadin.com/vaadin-prereleases/
-            </url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-    
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -198,9 +172,6 @@
                     <supportedPackagings>
                         <supportedPackaging>jar</supportedPackaging>
                     </supportedPackagings>
-                    <webApp>
-                        <resourceBases>${project.basedir}/src/main/resources/META-INF/resources</resourceBases>
-                    </webApp>
                 </configuration>
             </plugin>
             <plugin>

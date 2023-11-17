@@ -1,12 +1,13 @@
 package in.virit.mopo;
 
+import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.ElementHandle;
-import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.assertions.PlaywrightAssertions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.setDefaultAssertionTimeout;
 
 /**
  * General utilities for Playwright & Vaadin.
@@ -17,10 +18,6 @@ public class Mopo {
 
     public Mopo(Page page) {
         this.page = page;
-    }
-
-    public void waitForConnectionToSettle() {
-        waitForConnectionToSettle(page);
     }
 
     public static void waitForConnectionToSettle(Page page) {
@@ -46,13 +43,6 @@ public class Mopo {
     /**
      * Asserts that there are no JS errors in the dev console.
      */
-    public void assertNoJsErrors() {
-        assertNoJsErrors(page);
-    }
-
-    /**
-     * Asserts that there are no JS errors in the dev console.
-     */
     public static void assertNoJsErrors(Page page) {
 
         try {
@@ -68,5 +58,45 @@ public class Mopo {
             // expected
             return;
         }
+    }
+
+    public void waitForConnectionToSettle() {
+        waitForConnectionToSettle(page);
+    }
+
+    /**
+     * Asserts that there are no JS errors in the dev console.
+     */
+    public void assertNoJsErrors() {
+        assertNoJsErrors(page);
+    }
+
+    public List<String> getDevelopmentTimeViewNames(Browser browser, Page page) {
+        List<String> urls = new ArrayList<>();
+
+        String url = page.url();
+        String substring = url.substring(0, url.lastIndexOf("/"));
+        String temp = substring + "/kjhgfhjkhgb";
+        Page page1 = browser.newPage();
+        page1.navigate(temp);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        page1.waitForSelector("#outlet a");
+
+        List<ElementHandle> anchors = page1.locator("#outlet a").elementHandles();
+        for (ElementHandle anchor : anchors) {
+            String href = anchor.getAttribute("href");
+            if (href != null) {
+                urls.add(substring + "/" + href);
+            }
+        }
+
+        page1.close();
+        return urls;
     }
 }

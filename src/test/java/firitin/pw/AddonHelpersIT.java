@@ -10,8 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Tag("playwright")
@@ -65,5 +66,16 @@ public class AddonHelpersIT {
         }
         assertTrue(exceptionThrown);
         assertThat(page.locator("vaadin-dev-tools>div.error")).isAttached();
+   }
+
+
+   @Test
+    public void listView() {
+       page.navigate("http://localhost:" + port + "/addonhelpers");
+
+       // One could now open each of these and e.g. check for not JS errors
+       List<String> developmentTimeViewNames = mopo.getDevelopmentTimeViewNames(browser, page);
+       developmentTimeViewNames.forEach(System.out::println);
+
    }
 }

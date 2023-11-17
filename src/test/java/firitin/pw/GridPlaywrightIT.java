@@ -32,7 +32,7 @@ public class GridPlaywrightIT {
     public void setup() {
         browser = playwright.chromium()
                 .launch(new BrowserType.LaunchOptions()
-                        .setHeadless(false)
+//                        .setHeadless(false)
 //                        .setDevtools(true)
                 );
 
@@ -110,6 +110,21 @@ public class GridPlaywrightIT {
     @Test
     public void scrollingAndAssertingContent() {
         page.navigate("http://localhost:" + port + "/grid");
+
+
+        // Examples of hacks needed without GridPo, even for trivial asserts
+
+        // This is what one might try
+        String string = page.locator("#contact-grid #items td").first().textContent();
+        System.out.println("string = " + string); // empty string, slot, content elsewhere :-(
+
+        // This is how it can be done
+        String name = page.locator("#contact-grid #items td slot").first().getAttribute("name");
+        string = page.locator("#contact-grid vaadin-grid-cell-content[slot='%s']".formatted(name)).first().textContent();
+        System.out.println("string = " + string); // Now we are talking
+
+        // Now let's drop in GridPw helper
+
         GridPw grid = new GridPw(page.locator("#contact-grid"));
 
         System.out.println("Showing rows: %s-%s".formatted(grid.getFirstVisibleRowIndex(), grid.getLastVisibleRowIndex()));

@@ -31,8 +31,8 @@ public class AddonHelpersIT {
     public void setup() {
         browser = playwright.chromium()
                 .launch(new BrowserType.LaunchOptions()
-                        .setHeadless(false)
-                        .setDevtools(true)
+//                        .setHeadless(false)
+//                        .setDevtools(true)
                 );
 
         page = browser.newPage();

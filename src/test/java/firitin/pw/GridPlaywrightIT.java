@@ -33,7 +33,7 @@ public class GridPlaywrightIT {
     public void setup() {
         browser = playwright.chromium()
                 .launch(new BrowserType.LaunchOptions()
-                        .setHeadless(false)
+//                        .setHeadless(false)
 //                        .setDevtools(true)
                 );
 

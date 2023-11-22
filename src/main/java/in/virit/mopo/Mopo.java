@@ -64,6 +64,8 @@ public class Mopo {
     public static void assertNoJsErrors(Page page) {
 
         try {
+            assertThat(page.locator("vaadin-dev-tools")).isVisible();
+            waitForConnectionToSettle(page);
             ElementHandle elementHandle = page.waitForSelector("vaadin-dev-tools>div.error",
                     //wait for it just a tiny moment
                     new Page.WaitForSelectorOptions().setTimeout(100.0)
@@ -97,23 +99,14 @@ public class Mopo {
      * Returns a list of routes/views(URLs) that Vaadin app in development mode contains.
      *
      * @param browser the browser instance
-     * @param page    a currently open page that is used as a basis for analysis.
+     * @param rootUrl relative URLs of the test server views that in development time lists
      * @return a list of URLs pointing to known routes
      */
-    public List<String> getDevelopmentTimeViewNames(Browser browser, Page page) {
+    public List<String> getViewsReportedByDevMode(Browser browser, String rootUrl) {
         List<String> urls = new ArrayList<>();
 
-        String url = page.url();
-        String substring = url.substring(0, url.lastIndexOf("/"));
-        String temp = substring + "/kjhgfhjkhgb";
         Page page1 = browser.newPage();
-        page1.navigate(temp);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        page1.navigate(rootUrl);
 
         page1.waitForSelector("#outlet a");
 
@@ -121,10 +114,9 @@ public class Mopo {
         for (ElementHandle anchor : anchors) {
             String href = anchor.getAttribute("href");
             if (href != null) {
-                urls.add(substring + "/" + href);
+                urls.add(href);
             }
         }
-
         page1.close();
         return urls;
     }

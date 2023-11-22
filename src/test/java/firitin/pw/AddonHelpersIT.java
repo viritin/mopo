@@ -71,10 +71,8 @@ public class AddonHelpersIT {
 
    @Test
     public void listView() {
-       page.navigate("http://localhost:" + port + "/addonhelpers");
-
        // One could now open each of these and e.g. check for not JS errors
-       List<String> developmentTimeViewNames = mopo.getDevelopmentTimeViewNames(browser, page);
+       List<String> developmentTimeViewNames = mopo.getViewsReportedByDevMode(browser, "http://localhost:" + port + "/");
        developmentTimeViewNames.forEach(System.out::println);
 
    }

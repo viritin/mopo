@@ -2,6 +2,7 @@ package in.virit.mopo;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.ElementHandle;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 import java.util.ArrayList;
@@ -37,7 +38,6 @@ public class Mopo {
         assertThat(page.locator("vaadin-connection-indicator[loading]")).hasCount(0);
 
         // System.out.println("Waited for" + (System.currentTimeMillis() - start) + "ms");
-
     }
 
     /**
@@ -98,5 +98,64 @@ public class Mopo {
 
         page1.close();
         return urls;
+    }
+
+    /**
+     * Executes given task in a temporarily visible UI part, like a dialog or
+     * form. The UI part is expected to be detached after the task.
+     *
+     * @param locator a locator to the UI part or a part within it (like a
+     * "Save" button)
+     * @param taskToRun the task that should be performed in the temporarily
+     * visible component (composition)
+     */
+    public void driveIn(String selector, Runnable taskToRun) {
+        driveIn(page.locator(selector), taskToRun);
+    }
+
+    /**
+     * Executes given task in a temporarily visible UI part, like a dialog or
+     * form. The UI part is expected to be hidden after the task.
+     *
+     * @param locator a locator to the UI part or a part within it (like a
+     * "Save" button). This is used to verify that the component is shown before
+     * the given task is executed and hidden after the execution.
+     * @param taskToRun the task that should be performed in the temporarily
+     * visible component (composition)
+     */
+    public void driveIn(Locator locator, Runnable taskToRun) {
+        assertThat(locator).isVisible();
+        taskToRun.run();
+        assertThat(locator).not().isVisible();
+    }
+
+    /**
+     * A shorthand to click the referenced locator and to
+     * {@link #waitForConnectionToSettle()}. This is a helper you can for
+     * example use for "Save" button in your form, that asynchronously changes
+     * content already present in the UI. When using this instead of the raw
+     * Playwright click, you can assert the changed content right away without
+     * further magic.
+     *
+     * @param locator the locator to click
+     */
+    public void click(Locator locator) {
+        locator.click();
+        waitForConnectionToSettle();
+    }
+
+    /**
+     * A shorthand to click the referenced selector and to
+     * {@link #waitForConnectionToSettle()}. This is a helper you can for
+     * example use for "Save" button in your form, that asynchronously changes
+     * content already present in the UI. When using this instead of the raw
+     * Playwright click, you can assert the changed content right away without
+     * further magic.
+     *
+     * @param selector the selector to click
+     */
+    public void click(String selector) {
+        page.locator(selector).click();
+        waitForConnectionToSettle();
     }
 }

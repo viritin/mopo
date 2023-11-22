@@ -2,6 +2,7 @@ package firitin.pw;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import in.virit.mopo.GridPw;
@@ -32,7 +33,7 @@ public class GridPlaywrightIT {
     public void setup() {
         browser = playwright.chromium()
                 .launch(new BrowserType.LaunchOptions()
-//                        .setHeadless(false)
+                        .setHeadless(false)
 //                        .setDevtools(true)
                 );
 
@@ -69,7 +70,6 @@ public class GridPlaywrightIT {
 
         int rowCount = grid.getRenderedRowCount();
         assertTrue(rowCount > 0);
-
 
         page.getByPlaceholder("Filter by name...").locator("input")
                 .fill(originalFirstName.substring(0, 6));
@@ -164,4 +164,39 @@ public class GridPlaywrightIT {
         assertEquals("Lastname101", cellContent);
         System.out.println("Showing rows: %s-%s".formatted(grid.getFirstVisibleRowIndex(), grid.getLastVisibleRowIndex()));
     }
+
+
+    @Test
+    public void driveInForSavingTheForm() throws InterruptedException {
+        page.navigate("http://localhost:" + port + "/grid");
+
+        GridPw grid = new GridPw(page);
+        int rowToEdit = 2;
+        grid.selectRow(rowToEdit);
+        // form is now visible until save/cancle is clicked
+        String newName = "foobar";
+        Locator form = page.locator(".contact-form");
+        mopo.driveIn(form, () -> {
+            form.getByLabel("First name").fill(newName);
+            form.getByText("Save").click();
+            // Note, implicit checks that contact-form dissappears
+        });
+        assertThat(grid.getTableRow(rowToEdit).getCell(0)).hasText(newName);
+    }
+
+    @Test
+    public void mopoClickForSavingTheForm() throws InterruptedException {
+        page.navigate("http://localhost:" + port + "/grid");
+
+        GridPw grid = new GridPw(page);
+        int rowToEdit = 2;
+        grid.selectRow(rowToEdit);
+        // form is now visible until save/cancle is clicked
+        String newName = "foobar";
+        Locator form = page.locator(".contact-form");
+        form.getByLabel("First name").fill(newName);
+        mopo.click(form.getByText("Save"));
+        assertThat(grid.getTableRow(rowToEdit).getCell(0)).hasText(newName);
+    }
+
 }

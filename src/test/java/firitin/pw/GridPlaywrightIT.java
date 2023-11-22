@@ -53,7 +53,7 @@ public class GridPlaywrightIT {
         page.navigate("http://localhost:" + port + "/grid");
 
         GridPw grid = new GridPw(page);
-        String originalFirstName = grid.getTableRow(0).getCell(0).textContent();
+        String originalFirstName = grid.getRow(0).getCell(0).textContent();
 
         // Some warmup with simple GridPo API
         assertEquals(0, grid.getFirstVisibleRowIndex());
@@ -62,7 +62,7 @@ public class GridPlaywrightIT {
         grid.scrollToIndex(0);
 
         // Select the first row for editing
-        grid.getTableRow(0).select();
+        grid.getRow(0).select();
 
         // Check the form is visible and contains the first row data
         assertThat(page.getByLabel("First name", new Page.GetByLabelOptions().setExact(true)))
@@ -80,7 +80,7 @@ public class GridPlaywrightIT {
         int renderedRowCount = grid.getRenderedRowCount();
         assertEquals(1, renderedRowCount);
 
-        grid.getTableRow(0).select();
+        grid.getRow(0).select();
 
         String newFirstName = originalFirstName+"_changed0";
         if(originalFirstName.contains("_changed")) {
@@ -99,8 +99,8 @@ public class GridPlaywrightIT {
 
         // Get the first cell of the first row in Grid and check text
         // TODO add API to get cell by column header text
-        assertThat(grid.getTableRow(0).getCell(0)).hasText(newFirstName);
-        assertThat(grid.getTableRow(0).getCell("First Name")).hasText(newFirstName);
+        assertThat(grid.getRow(0).getCell(0)).hasText(newFirstName);
+        assertThat(grid.getRow(0).getCell("First Name")).hasText(newFirstName);
 
         // An alternative way to verify without GridPo
         assertThat(page.locator("vaadin-grid-cell-content").and(page.getByText(newFirstName))).isVisible();
@@ -130,23 +130,23 @@ public class GridPlaywrightIT {
         System.out.println("Showing rows: %s-%s".formatted(grid.getFirstVisibleRowIndex(), grid.getLastVisibleRowIndex()));
 
         String cellContent;
-        cellContent = grid.getTableRow(0).getCell(0).textContent();
+        cellContent = grid.getRow(0).getCell(0).textContent();
         assertEquals("First0", cellContent);
-        cellContent = grid.getTableRow(0).getCell("First Name").textContent();
+        cellContent = grid.getRow(0).getCell("First Name").textContent();
         assertEquals("First0", cellContent);
 
-        cellContent = grid.getTableRow(0).getCell(1).textContent();
+        cellContent = grid.getRow(0).getCell(1).textContent();
         assertEquals("Lastname0", cellContent);
-        cellContent = grid.getTableRow(0).getCell("Last Name").textContent();
+        cellContent = grid.getRow(0).getCell("Last Name").textContent();
         assertEquals("Lastname0", cellContent);
 
         grid.scrollToIndex(3);
 
         System.out.println("Showing rows: %s-%s".formatted(grid.getFirstVisibleRowIndex(), grid.getLastVisibleRowIndex()));
 
-        cellContent = grid.getTableRow(0).getCell(0).textContent();
+        cellContent = grid.getRow(0).getCell(0).textContent();
         assertEquals("First0", cellContent);
-        cellContent = grid.getTableRow(0).getCell("First Name").textContent();
+        cellContent = grid.getRow(0).getCell("First Name").textContent();
         assertEquals("First0", cellContent);
 
         grid.scrollToIndex(100);
@@ -155,12 +155,12 @@ public class GridPlaywrightIT {
 
 
         // this should now automatically scroll row index 0 to be visible
-        cellContent = grid.getTableRow(0).getCell(0).textContent();
+        cellContent = grid.getRow(0).getCell(0).textContent();
         assertEquals("First0", cellContent);
-        cellContent = grid.getTableRow(0).getCell("First Name").textContent();
+        cellContent = grid.getRow(0).getCell("First Name").textContent();
         assertEquals("First0", cellContent);
         System.out.println("Showing rows: %s-%s".formatted(grid.getFirstVisibleRowIndex(), grid.getLastVisibleRowIndex()));
-        cellContent = grid.getTableRow(101).getCell(1).textContent();
+        cellContent = grid.getRow(101).getCell(1).textContent();
         assertEquals("Lastname101", cellContent);
         System.out.println("Showing rows: %s-%s".formatted(grid.getFirstVisibleRowIndex(), grid.getLastVisibleRowIndex()));
     }
@@ -181,7 +181,7 @@ public class GridPlaywrightIT {
             form.getByText("Save").click();
             // Note, implicit checks that contact-form dissappears
         });
-        assertThat(grid.getTableRow(rowToEdit).getCell(0)).hasText(newName);
+        assertThat(grid.getRow(rowToEdit).getCell(0)).hasText(newName);
     }
 
     @Test
@@ -196,7 +196,7 @@ public class GridPlaywrightIT {
         Locator form = page.locator(".contact-form");
         form.getByLabel("First name").fill(newName);
         mopo.click(form.getByText("Save"));
-        assertThat(grid.getTableRow(rowToEdit).getCell(0)).hasText(newName);
+        assertThat(grid.getRow(rowToEdit).getCell(0)).hasText(newName);
     }
 
 }

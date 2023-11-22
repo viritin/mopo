@@ -11,22 +11,38 @@ import java.util.List;
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 /**
- * General utilities for Playwright & Vaadin.
+ * General utilities for Playwright and Vaadin.
  */
 public class Mopo {
 
     private final Page page;
 
+    /**
+     * Constructs a new Mopo for given page
+     *
+     * @param page the page use by this Mopo instance
+     */
     public Mopo(Page page) {
         this.page = page;
     }
 
+    /**
+     * Waits until the client-server communication by Vaadin has settled.
+     *
+     * @param page the page on which Vaadin app is expected to be run
+     */
     public static void waitForConnectionToSettle(Page page) {
         // Default to be bit larger than the defaults for lazy value change events
         int minWait = 500;
         waitForConnectionToSettle(page, minWait);
     }
 
+    /**
+     * Waits until the client-server communication by Vaadin has settled.
+     *
+     * @param page the page on which Vaadin app is expected to be run
+     * @param minWait the minimum wait time spent to watch if client-server communication starts
+     */
     public static void waitForConnectionToSettle(Page page, int minWait) {
         long start = System.currentTimeMillis();
 
@@ -42,6 +58,8 @@ public class Mopo {
 
     /**
      * Asserts that there are no JS errors in the dev console.
+     *
+     * @param page the page to be checked
      */
     public static void assertNoJsErrors(Page page) {
 
@@ -60,6 +78,10 @@ public class Mopo {
         }
     }
 
+    /**
+     * Waits until the client-server communication by Vaadin
+     * has settled.
+     */
     public void waitForConnectionToSettle() {
         waitForConnectionToSettle(page);
     }
@@ -71,6 +93,13 @@ public class Mopo {
         assertNoJsErrors(page);
     }
 
+    /**
+     * Returns a list of routes/views(URLs) that Vaadin app in development mode contains.
+     *
+     * @param browser the browser instance
+     * @param page    a currently open page that is used as a basis for analysis.
+     * @return a list of URLs pointing to known routes
+     */
     public List<String> getDevelopmentTimeViewNames(Browser browser, Page page) {
         List<String> urls = new ArrayList<>();
 
@@ -102,12 +131,13 @@ public class Mopo {
 
     /**
      * Executes given task in a temporarily visible UI part, like a dialog or
-     * form. The UI part is expected to be detached after the task.
+     * form. The UI part is expected to be detached after the task (implicitly
+     * asserted).
      *
-     * @param locator a locator to the UI part or a part within it (like a
-     * "Save" button)
+     * @param selector  a selector to the UI part to be accessed or a part within it (like a
+     *                  "Save" button)
      * @param taskToRun the task that should be performed in the temporarily
-     * visible component (composition)
+     *                  visible component (composition)
      */
     public void driveIn(String selector, Runnable taskToRun) {
         driveIn(page.locator(selector), taskToRun);
@@ -117,11 +147,11 @@ public class Mopo {
      * Executes given task in a temporarily visible UI part, like a dialog or
      * form. The UI part is expected to be hidden after the task.
      *
-     * @param locator a locator to the UI part or a part within it (like a
-     * "Save" button). This is used to verify that the component is shown before
-     * the given task is executed and hidden after the execution.
+     * @param locator   a locator to the UI part or a part within it (like a
+     *                  "Save" button). This is used to verify that the component is shown before
+     *                  the given task is executed and hidden after the execution.
      * @param taskToRun the task that should be performed in the temporarily
-     * visible component (composition)
+     *                  visible component (composition)
      */
     public void driveIn(Locator locator, Runnable taskToRun) {
         assertThat(locator).isVisible();

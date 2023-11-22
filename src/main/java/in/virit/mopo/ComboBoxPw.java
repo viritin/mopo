@@ -4,6 +4,9 @@ import com.microsoft.playwright.Locator;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
+/**
+ * Helper class to work with vaadin-combo-box component
+ */
 public class ComboBoxPw {
 
     private final Locator root;
@@ -28,7 +31,14 @@ public class ComboBoxPw {
         root.locator("input").press("Enter");
     }
 
+    /**
+     * Fills given filter to the combobox.
+     *
+     * @param filter the filter string to be set
+     * @return the {@link ComboBoxPw} (for fluent API)
+     */
     public ComboBoxPw filter(String filter) {
+        root.locator("input").clear();
         root.locator("input").fill(filter);
         return this;
     }

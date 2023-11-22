@@ -3,54 +3,16 @@ package in.virit.mopo;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
+/**
+ * A helper class to work with the vaadin-grid component.
+ */
 public class GridPw {
-
-    public class RowPw {
-        private final int rowIndex;
-
-        private RowPw(int rowIndex) {
-            this.rowIndex = rowIndex;
-        }
-
-        /**
-         * Gets the cell locator at the given index.
-         *
-         * @param cellIndex the cell index (0-based, unlike the CSS nth-child selector, whose designer should be hung by the balls, in case they have any)
-         * @return the cell locator
-         */
-        public Locator getCell(int cellIndex) {
-            int indexInVirtualTable = (Integer) root.evaluate("g => g._getRenderedRows().indexOf(g._getRenderedRows().filter(r => r.index == %s)[0]);".formatted(rowIndex));
-            indexInVirtualTable += 1; // 1-based :-)
-            String name = root.locator("#items tr:nth-child(%s) td:nth-child(%s) slot".formatted(indexInVirtualTable, cellIndex+1))
-                    .getAttribute("name");
-            return root.locator("vaadin-grid-cell-content[slot='%s']".formatted(name));
-        }
-
-        /**
-         * Gets the cell with the given header text.
-         * @param headerText the header text
-         * @return the cell locator
-         */
-        public Locator getCell(String headerText) {
-            // this depends heavily on Grid's internal implementation
-            // Grid developers probably have a better way to do this
-            String slot = root.locator("vaadin-grid-cell-content")
-                    .filter(new Locator.FilterOptions().setHasText(headerText))
-                    .getAttribute("slot");
-            String substring = slot.substring(slot.lastIndexOf("-") + 1);
-            int cellIndex = Integer.parseInt(substring);
-            return getCell(cellIndex);
-        }
-
-        public void select() {
-            GridPw.this.selectRow(rowIndex);
-        }
-    }
 
     private final Locator root;
 
     /**
      * Creates a Grid page object for the given grid locator.
+     *
      * @param gridLocator the Playwright locator for the grid
      */
     public GridPw(Locator gridLocator) {
@@ -59,6 +21,7 @@ public class GridPw {
 
     /**
      * Creates a Grid page object for the first grid on the page.
+     *
      * @param page the Playwright page
      */
     public GridPw(Page page) {
@@ -75,6 +38,11 @@ public class GridPw {
         return evaluate;
     }
 
+    /**
+     * Returns the index of the first visible row
+     *
+     * @return the index.
+     */
     public int getFirstVisibleRowIndex() {
         return (Integer) root.elementHandle().evaluate("e => e._firstVisibleIndex");
     }
@@ -131,7 +99,7 @@ public class GridPw {
                         }, 100);
                     });
                 }""");
-         // System.out.println("RETURN value = " + value);
+        // System.out.println("RETURN value = " + value);
     }
 
     /**
@@ -141,20 +109,27 @@ public class GridPw {
      */
     public void selectRow(int rowIndex) {
         String script = """
-        grid => {
-            var firstRowIndex = %s;
-            var lastRowIndex = firstRowIndex;
-            var rowsInDom = grid._getRenderedRows();
-            var rows = Array.from(rowsInDom).filter((row) => { return row.index >= firstRowIndex && row.index <= lastRowIndex;});
-            var row = rows[0];
-            grid.activeItem = row._item;
-        }
-        """.formatted(rowIndex);
+                grid => {
+                    var firstRowIndex = %s;
+                    var lastRowIndex = firstRowIndex;
+                    var rowsInDom = grid._getRenderedRows();
+                    var rows = Array.from(rowsInDom).filter((row) => { return row.index >= firstRowIndex && row.index <= lastRowIndex;});
+                    var row = rows[0];
+                    grid.activeItem = row._item;
+                }
+                """.formatted(rowIndex);
         root.elementHandle().evaluate(script);
     }
 
-    public RowPw getTableRow(int rowIndex) {
-        if(!isRowInView(rowIndex)) {
+    /**
+     * Returns a RowPw helper representing the row defined by the given index.
+     *
+     * @param rowIndex the row index
+     * @return the RowPw for editing the UI state or to get cell locators for
+     * assertions.
+     */
+    public RowPw getRow(int rowIndex) {
+        if (!isRowInView(rowIndex)) {
             scrollToIndex(rowIndex);
         }
         return new RowPw(rowIndex);
@@ -163,19 +138,76 @@ public class GridPw {
     /**
      * Checks if the given row is in the visible viewport.
      *
-     * @param rowIndex
-     *            the row to check
+     * @param rowIndex the row to check
      * @return <code>true</code> if the row is at least partially in view,
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public boolean isRowInView(int rowIndex) {
         return (getFirstVisibleRowIndex() <= rowIndex
                 && rowIndex <= getLastVisibleRowIndex());
     }
 
+    /**
+     * Returns the index of last visible row.
+     *
+     * @return the index
+     */
     public int getLastVisibleRowIndex() {
         return (Integer) root.elementHandle().evaluate("e => e._lastVisibleIndex");
     }
 
+    /**
+     * Represents a row in the vaadin-grid component. Not that there is no DOM
+     * element backing this row, but this is purely virtual helper class based
+     * on row index.
+     */
+    public class RowPw {
+
+        private final int rowIndex;
+
+        private RowPw(int rowIndex) {
+            this.rowIndex = rowIndex;
+        }
+
+        /**
+         * Gets the cell locator at the given index.
+         *
+         * @param cellIndex the cell index (0-based, unlike the CSS nth-child
+         * selector, whose designer should be hung by the balls, in case they
+         * have any)
+         * @return the cell locator
+         */
+        public Locator getCell(int cellIndex) {
+            int indexInVirtualTable = (Integer) root.evaluate("g => g._getRenderedRows().indexOf(g._getRenderedRows().filter(r => r.index == %s)[0]);".formatted(rowIndex));
+            indexInVirtualTable += 1; // 1-based :-)
+            String name = root.locator("#items tr:nth-child(%s) td:nth-child(%s) slot".formatted(indexInVirtualTable, cellIndex + 1))
+                    .getAttribute("name");
+            return root.locator("vaadin-grid-cell-content[slot='%s']".formatted(name));
+        }
+
+        /**
+         * Gets the cell with the given header text.
+         *
+         * @param headerText the header text
+         * @return the cell locator
+         */
+        public Locator getCell(String headerText) {
+            // this depends heavily on Grid's internal implementation
+            // Grid developers probably have a better way to do this
+            String slot = root.locator("vaadin-grid-cell-content")
+                    .filter(new Locator.FilterOptions().setHasText(headerText))
+                    .getAttribute("slot");
+            String substring = slot.substring(slot.lastIndexOf("-") + 1);
+            int cellIndex = Integer.parseInt(substring);
+            return getCell(cellIndex);
+        }
+
+        /**
+         * Selects the given row.
+         */
+        public void select() {
+            GridPw.this.selectRow(rowIndex);
+        }
+    }
 
 }

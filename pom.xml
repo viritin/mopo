@@ -9,7 +9,7 @@
     <description>Java Playwright helpers for Vaadin users</description>
 
     <properties>
-        <vaadin.version>24.2.2</vaadin.version>
+        <vaadin.version>24.3.5</vaadin.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -58,7 +58,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.10.1</version>
+                <version>5.10.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>com.microsoft.playwright</groupId>
             <artifactId>playwright</artifactId>
-            <version>1.39.0</version> <!-- Check the latest version via https://playwright.dev -->
+            <version>1.41.2</version> <!-- Check the latest version via https://playwright.dev -->
         </dependency>
 
         <dependency>

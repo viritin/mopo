@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>in.virit</groupId>
     <artifactId>mopo</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3-SNAPSHOT</version>
     <name>Mopo</name>
     <packaging>jar</packaging>
     <description>Java Playwright helpers for Vaadin users</description>
@@ -28,7 +28,7 @@
         <url>https://github.com/viritin/mopo</url>
         <connection>scm:git:git://github.com/viritin/mopo.git</connection>
         <developerConnection>scm:git:ssh://git@github.com:/viritin/mopo.git</developerConnection>
-      <tag>mopo-0.0.2</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <issueManagement>

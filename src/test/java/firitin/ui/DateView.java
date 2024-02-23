@@ -19,10 +19,9 @@ public class DateView extends VerticalLayout {
 
     public DateView() {
 
-        UI.getCurrent().setLocale(Locale.forLanguageTag("fi"));
-
         DatePicker datePicker = new DatePicker();
         datePicker.setId("dp");
+        datePicker.setLocale(Locale.US);
 
         Paragraph dpValue = new Paragraph();
         dpValue.setId("dpValue");
@@ -32,6 +31,7 @@ public class DateView extends VerticalLayout {
         add(datePicker, dpValue);
 
         DateTimePicker dateTimePicker = new DateTimePicker();
+        dateTimePicker.setLocale(Locale.US);
         dateTimePicker.setStep(Duration.of(1, ChronoUnit.SECONDS));
         dateTimePicker.setId("dtp");
         Paragraph dtpValue = new Paragraph();

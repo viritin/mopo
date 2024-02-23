@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -78,7 +79,8 @@ public class DatePickerIT {
         value = datePickerPw.getValue();
         String valueInField = datePickerPw.getInputString();
 
-        String formattedNow = DateTimeFormatter.ofPattern("dd.M.yyyy").format(now);
+
+        String formattedNow = DateTimeFormatter.ofPattern("M/d/yyyy", Locale.US).format(now);
 
         assertEquals(formattedNow, valueInField);
         assertThat(page.locator("#dpValue")).containsText(now.toString());
@@ -93,8 +95,8 @@ public class DatePickerIT {
 
         String dateInputValue = dateTimePickerPw.getDateInputString();
         String timeInputValue = dateTimePickerPw.getTimeInputString();
-        assertEquals("24.12.2001", dateInputValue);
-        assertEquals("22.36.00", timeInputValue);
+        assertEquals("12/24/2001", dateInputValue);
+        assertEquals("10:36:00 PM", timeInputValue);
 
         System.out.println("Success!!");
 
@@ -102,10 +104,9 @@ public class DatePickerIT {
 
     @Test
     public void doStuffWithRawApi() {
-        // Finnish formatting set in the UI
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH.mm");
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH.mm");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M/d/yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M/d/yyyy HH:mm");
 
         page.navigate("http://localhost:" + port + "/date");
 

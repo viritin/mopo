@@ -78,7 +78,7 @@ public class DatePickerIT {
         value = datePickerPw.getValue();
         String valueInField = datePickerPw.getInputString();
 
-        String formattedNow = DateTimeFormatter.ofPattern("dd.MM.yyyy").format(now);
+        String formattedNow = DateTimeFormatter.ofPattern("dd.M.yyyy").format(now);
 
         assertEquals(formattedNow, valueInField);
         assertThat(page.locator("#dpValue")).containsText(now.toString());

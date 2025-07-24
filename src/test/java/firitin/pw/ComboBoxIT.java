@@ -59,6 +59,8 @@ public class ComboBoxIT {
         Locator cb = page.locator("input[role='combobox']");
 
         cb.fill("foo");
+        // seems to be needed with latest Vaadin versions
+        page.waitForTimeout(1000);
         cb.press("Enter");
 
         assertThat(value).containsText("foo");

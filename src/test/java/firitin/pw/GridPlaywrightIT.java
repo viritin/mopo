@@ -99,6 +99,11 @@ public class GridPlaywrightIT {
 
         // Get the first cell of the first row in Grid and check text
         // TODO add API to get cell by column header text
+        page.waitForTimeout(1000);
+        page.waitForTimeout(1000);
+
+        mopo.waitForConnectionToSettle();
+
         assertThat(grid.getRow(0).getCell(0)).hasText(newFirstName);
         assertThat(grid.getRow(0).getCell("First Name")).hasText(newFirstName);
 

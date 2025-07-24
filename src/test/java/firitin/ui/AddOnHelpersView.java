@@ -1,6 +1,7 @@
 package firitin.ui;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 
@@ -13,6 +14,7 @@ public class AddOnHelpersView extends VerticalLayout {
         add(new Button("Throw JS exception", e -> {
             // deliberately cause a JS exception
             getElement().executeJs("window.foo();");
+            add(new Paragraph("Error should have been thrown!"));
         }));
     }
 }

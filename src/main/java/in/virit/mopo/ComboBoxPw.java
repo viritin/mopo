@@ -28,7 +28,14 @@ public class ComboBoxPw {
      */
     public void filterAndSelectFirst(String filter) {
         filter(filter);
+
+        // seems to be needed with latest Vaadin versions
+        assertThat(root).not().hasAttribute("loading", "");
+
         root.locator("input").press("Enter");
+
+        // seems to be needed with latest Vaadin versions
+        assertThat(root).not().hasAttribute("opened", "");
     }
 
     /**

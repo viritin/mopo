@@ -1,7 +1,6 @@
 package in.virit.mopo;
 
 import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.ConsoleMessage;
 import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -17,6 +16,7 @@ import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertTha
 public class Mopo {
 
     private final Page page;
+    private List<String> clientSideErrors = new ArrayList<>();
 
     /**
      * Constructs a new Mopo for given page
@@ -25,28 +25,6 @@ public class Mopo {
      */
     public Mopo(Page page) {
         this.page = page;
-    }
-
-    private List<ConsoleMessage> consoleErrors;
-
-    public void trackConsoleErrors() {
-        consoleErrors = new ArrayList<>();
-        page.onConsoleMessage(msg -> {
-            System.out.println("Console message: " + msg.type() + " " + msg.text());
-            if (msg.type().equals("error")) {
-                consoleErrors.add(msg);
-            }
-        });
-    }
-
-    /**
-     * Returns the list of console errors that have been logged since the
-     * {@link #trackConsoleErrors()} was called.
-     *
-     * @return a list of console messages that are errors
-     */
-    public List<ConsoleMessage> getConsoleErrors() {
-        return consoleErrors;
     }
 
     /**
@@ -63,7 +41,7 @@ public class Mopo {
     /**
      * Waits until the client-server communication by Vaadin has settled.
      *
-     * @param page the page on which Vaadin app is expected to be run
+     * @param page    the page on which Vaadin app is expected to be run
      * @param minWait the minimum wait time spent to watch if client-server communication starts
      */
     public static void waitForConnectionToSettle(Page page, int minWait) {
@@ -83,8 +61,7 @@ public class Mopo {
      * Asserts that there are no JS errors in the dev console.
      *
      * @param page the page to be checked
-     *
-     * @deprecated this method depends on dev mode, consider using {@link #failIfJsErrorsFound()} and {@link #trackConsoleErrors()} that use browser console.
+     * @deprecated this method depends on dev mode, consider using {@link #failOnClientSideErrors()} ()} and {@link #trackClientSideErrors()} that use browser console.
      */
     @Deprecated
     public static void assertNoJsErrors(Page page) {
@@ -107,6 +84,35 @@ public class Mopo {
     }
 
     /**
+     * Starts monitoring browser console and errors and collects
+     * those for further inspection (e.g. with {@link #getClientSideErrors()} or {@link #failOnClientSideErrors()}).
+     */
+    public void trackClientSideErrors() {
+        page.waitForTimeout(1000);
+        page.onConsoleMessage(msg -> {
+            System.out.println("Console message: " + msg.type() + " " + msg.text());
+            if (msg.type().equals("error")) {
+                clientSideErrors.add(msg.text());
+            }
+        });
+
+        page.onPageError(error -> {
+            System.out.println("Page error: " + error);
+            clientSideErrors.add(error);
+        });
+    }
+
+    /**
+     * Returns the list of console errors that have been logged since the
+     * {@link #trackClientSideErrors()} was called.
+     *
+     * @return a list of console messages that are errors
+     */
+    public List<String> getClientSideErrors() {
+        return clientSideErrors;
+    }
+
+    /**
      * Waits until the client-server communication by Vaadin
      * has settled.
      */
@@ -117,7 +123,7 @@ public class Mopo {
     /**
      * Asserts that there are no JS errors in the dev console.
      *
-     * @deprecated this method depends on dev mode, consider using {@link #failIfJsErrorsFound()} and {@link #trackConsoleErrors()} that use browser console.
+     * @deprecated this method depends on dev mode, consider using {@link #failOnClientSideErrors()} ()} and {@link #trackClientSideErrors()} that use browser console.
      */
     @Deprecated
     public void assertNoJsErrors() {
@@ -210,13 +216,18 @@ public class Mopo {
         waitForConnectionToSettle();
     }
 
-    public void failIfJsErrorsFound() {
-        if (consoleErrors != null && !consoleErrors.isEmpty()) {
+    /**
+     * Asserts that there are no client-side errors in the console.
+     * Throws a RuntimeException if there are any errors.
+     */
+    public void failOnClientSideErrors() {
+        List<String> consoleErrors = getClientSideErrors();
+        if (!consoleErrors.isEmpty()) {
             StringBuilder sb = new StringBuilder("There are JS errors in the console:\n");
-            for (ConsoleMessage msg : consoleErrors) {
-                sb.append(msg.type()).append(": ").append(msg.text()).append("\n");
+            for (var msg : consoleErrors) {
+                sb.append(msg).append("\n");
             }
-            throw new AssertionError(sb.toString());
+            throw new RuntimeException("JS errors discovered: "+ sb.toString());
         }
     }
 }

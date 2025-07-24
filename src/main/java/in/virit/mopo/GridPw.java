@@ -179,9 +179,8 @@ public class GridPw {
          */
         public Locator getCell(int cellIndex) {
             int indexInVirtualTable = (Integer) root.evaluate("g => g._getRenderedRows().indexOf(g._getRenderedRows().filter(r => r.index == %s)[0]);".formatted(rowIndex));
-            indexInVirtualTable += 1; // 1-based :-)
-            String name = root.locator("#items tr:nth-child(%s) td:nth-child(%s) slot".formatted(indexInVirtualTable, cellIndex + 1))
-                    .getAttribute("name");
+            Locator row = root.locator("#items tr").filter(new Locator.FilterOptions().setVisible(true)).nth(indexInVirtualTable);
+            String name = row.locator("td:nth-child(%s) slot".formatted(cellIndex + 1)).getAttribute("name");
             return root.locator("vaadin-grid-cell-content[slot='%s']".formatted(name));
         }
 

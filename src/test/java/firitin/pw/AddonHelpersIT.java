@@ -6,6 +6,7 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import in.virit.mopo.Mopo;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,6 @@ public class AddonHelpersIT {
     private final int port = 9998;
 
     static Playwright playwright = Playwright.create();
-
-    static {
-    }
 
     private Browser browser;
     private Page page;
@@ -68,8 +66,40 @@ public class AddonHelpersIT {
         assertThat(page.locator("vaadin-dev-tools>div.error")).isAttached();
    }
 
+    @Test
+    public void checkJsErrorsViaConsole() throws InterruptedException {
+        mopo.trackConsoleErrors();
 
-   @Test
+        page.navigate("http://localhost:" + port + "/addonhelpers");
+
+        mopo.waitForConnectionToSettle();
+
+        Assertions.assertEquals(0, mopo.getConsoleErrors().size(),
+                "There should be no console errors after the page has loaded");
+
+        // a helper message to fail the test if there is a JS error
+        mopo.failIfJsErrorsFound();
+
+        // This old version checks same from the Vaadin Dev Tools
+        mopo.assertNoJsErrors();
+
+        page.getByText("Throw JS exception").click();
+
+        mopo.waitForConnectionToSettle();
+
+        Assertions.assertTrue(mopo.getConsoleErrors().size() > 0,
+                "There should be at least one JS error in the console");
+
+        try {
+            mopo.failIfJsErrorsFound();
+        } catch (java.lang.AssertionError e) {
+            // Expected
+            System.out.println("Expected JS error in console.");
+        }
+
+    }
+
+    @Test
     public void listView() {
        // One could now open each of these and e.g. check for not JS errors
        List<String> developmentTimeViewNames = mopo.getViewsReportedByDevMode(browser, "http://localhost:" + port + "/");

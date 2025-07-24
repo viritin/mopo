@@ -1,6 +1,7 @@
 package in.virit.mopo;
 
 import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.ConsoleMessage;
 import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
@@ -24,6 +25,28 @@ public class Mopo {
      */
     public Mopo(Page page) {
         this.page = page;
+    }
+
+    private List<ConsoleMessage> consoleErrors;
+
+    public void trackConsoleErrors() {
+        consoleErrors = new ArrayList<>();
+        page.onConsoleMessage(msg -> {
+            System.out.println("Console message: " + msg.type() + " " + msg.text());
+            if (msg.type().equals("error")) {
+                consoleErrors.add(msg);
+            }
+        });
+    }
+
+    /**
+     * Returns the list of console errors that have been logged since the
+     * {@link #trackConsoleErrors()} was called.
+     *
+     * @return a list of console messages that are errors
+     */
+    public List<ConsoleMessage> getConsoleErrors() {
+        return consoleErrors;
     }
 
     /**
@@ -60,7 +83,10 @@ public class Mopo {
      * Asserts that there are no JS errors in the dev console.
      *
      * @param page the page to be checked
+     *
+     * @deprecated this method depends on dev mode, consider using {@link #failIfJsErrorsFound()} and {@link #trackConsoleErrors()} that use browser console.
      */
+    @Deprecated
     public static void assertNoJsErrors(Page page) {
 
         try {
@@ -90,7 +116,10 @@ public class Mopo {
 
     /**
      * Asserts that there are no JS errors in the dev console.
+     *
+     * @deprecated this method depends on dev mode, consider using {@link #failIfJsErrorsFound()} and {@link #trackConsoleErrors()} that use browser console.
      */
+    @Deprecated
     public void assertNoJsErrors() {
         assertNoJsErrors(page);
     }
@@ -179,5 +208,15 @@ public class Mopo {
     public void click(String selector) {
         page.locator(selector).click();
         waitForConnectionToSettle();
+    }
+
+    public void failIfJsErrorsFound() {
+        if (consoleErrors != null && !consoleErrors.isEmpty()) {
+            StringBuilder sb = new StringBuilder("There are JS errors in the console:\n");
+            for (ConsoleMessage msg : consoleErrors) {
+                sb.append(msg.type()).append(": ").append(msg.text()).append("\n");
+            }
+            throw new AssertionError(sb.toString());
+        }
     }
 }

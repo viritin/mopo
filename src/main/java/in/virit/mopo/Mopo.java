@@ -90,14 +90,12 @@ public class Mopo {
     public void trackClientSideErrors() {
         page.waitForTimeout(1000);
         page.onConsoleMessage(msg -> {
-            System.out.println("Console message: " + msg.type() + " " + msg.text());
             if (msg.type().equals("error")) {
                 clientSideErrors.add(msg.text());
             }
         });
 
         page.onPageError(error -> {
-            System.out.println("Page error: " + error);
             clientSideErrors.add(error);
         });
     }

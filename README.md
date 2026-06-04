@@ -1,5 +1,7 @@
 # Mopo - a helper library for testing Vaadin apps with Playwright
 
+**Note, the [Dramafinder project](https://github.com/parttio/dramafinder) contains a lot more extensive set of component helpers and is a lot more helpful in typical Vaadin projects. This is still relevant for some add-on style projects.** 
+
 Mopo contains Java helper classes for Playwright users. Especially for more complex Vaadin components, like vaadin-grid, vaadin-date-picker, vaadin-date-time-picker, vaadin-combo-box etc.
 
 To try/use Mopo, add following dependency to your pom.xml (or to Gradle build):
